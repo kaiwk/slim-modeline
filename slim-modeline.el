@@ -49,6 +49,9 @@
 (defvar smm-inactive-background-backup nil
   "Mode line inactive background backup.")
 
+(defvar smm-height-backup nil
+  "Mode line height backup.")
+
 (defvar smm-format-backup nil
   "Mode line background.")
 
@@ -73,6 +76,7 @@
           (setq-default smm-format-backup  mode-line-format)
           (setq-default mode-line-format "")
 
+          (setq smm-height-backup (face-attribute 'mode-line :height))
           (setq smm-foreground-backup (face-attribute 'mode-line :foreground))
           (setq smm-background-backup (face-attribute 'mode-line :background))
           (setq smm-inactive-foreground-backup (face-attribute 'mode-line-inactive :foreground))
@@ -96,8 +100,8 @@
         (set-face-attribute 'mode-line-inactive nil :background smm-inactive-background-backup)
         (set-face-attribute 'mode-line-inactive nil :foreground smm-inactive-foreground-backup)
 
-        (set-face-attribute 'mode-line nil :height 1)
-        (set-face-attribute 'mode-line-inactive nil :height 1)))
+        (set-face-attribute 'mode-line nil :height smm-height-backup)
+        (set-face-attribute 'mode-line-inactive nil :height smm-height-backup)))
     (smm-save-and-revert-all-file-buffers)))
 
 (provide 'slim-modeline)
