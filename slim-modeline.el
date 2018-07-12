@@ -32,7 +32,7 @@
   :prefix "smm-"
   :group 'mode-line)
 
-(defcustom smm-slim-modeline-color "darkred"
+(defcustom smm-slim-modeline-color nil
   "Slim mode line color."
   :type 'string
   :group 'slim-modeline)
@@ -63,6 +63,7 @@
         (with-current-buffer buf
           (revert-buffer :ignore-auto :noconfirm))))))
 
+;;;###autoload
 (define-minor-mode slim-modeline-mode
   "Minimize modeline to a line"
   :global t
