@@ -1,6 +1,8 @@
 * slim-modeline
-This package provides functionality to minimize mode line. Basically it will make mode line look like a straight line, and you can customize its color. By default it uses your theme mode line background as its color.
+This package provides functionality to minimize mode line. Basically it will make mode line look like a straight line, you can invoke method =toggle-slim-modeline= or make a keybinding for it.
 
 #+BEGIN_SRC elisp
-  (setq smm-slim-modeline-color "darkred")
+  (global-set-key (kbd "C-x f") 'toggle-slim-modeline) ; "C-x f" means full-screen. :)
 #+END_SRC
+
+[[file:screenshot.gif]]
