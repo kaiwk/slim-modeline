@@ -1,4 +1,4 @@
-;;; slim-modeline.el --- A package provides functionality to minimize mode line.
+;;; slim-modeline --- A package provides functionality to minimize mode line.
 
 ;; Copyright (C) 2018  kaiwk
 
@@ -23,7 +23,7 @@
 ;;; Commentary:
 
 ;; This package provides functionality to minimize mode line. Basically it will
-;; make mode line look like a straight line, and user can customize its color.
+;; make mode line look like a straight line.
 
 ;;; Code:
 
@@ -32,80 +32,11 @@
   :prefix "smm-"
   :group 'mode-line)
 
-(defcustom smm-slim-modeline-color nil
-  "Slim mode line color."
-  :type 'string
-  :group 'slim-modeline)
+(defvar smm--modeline-format-backup nil
+  "slim mode line format backup")
 
-(defvar smm--foreground-backup nil
-  "Mode line foreground backup.")
-
-(defvar smm--background-backup nil
-  "Mode line background backup.")
-
-(defvar smm--inactive-foreground-backup nil
-  "Mode line inactive foreground backup.")
-
-(defvar smm--inactive-background-backup nil
-  "Mode line inactive background backup.")
-
-(defvar smm--height-backup nil
-  "Mode line height backup.")
-
-(defvar smm--format-backup nil
-  "Mode line background.")
-
-;;;###autoload
-(defun smm-load-theme (theme &optional no-confirm no-enable)
-  (interactive
-   (list
-    (intern (completing-read "Load custom theme: "
-                             (mapcar 'symbol-name
-                                     (custom-available-themes))))
-    nil nil))
-  (load-theme theme no-confirm no-enable)
-
-  (if slim-modeline-mode
-      (smm--backup-bg-fg-color)))
-
-(defun smm--set-modeline-color (modeline-color)
-  "Set mode line color."
-  (unless smm-slim-modeline-color
-    (setq smm-slim-modeline-color modeline-color))
-  (set-face-attribute 'mode-line nil :background smm-slim-modeline-color)
-  (set-face-attribute 'mode-line nil :foreground smm-slim-modeline-color)
-  (set-face-attribute 'mode-line-inactive nil :background smm-slim-modeline-color)
-  (set-face-attribute 'mode-line-inactive nil :foreground smm-slim-modeline-color))
-
-(defun smm--backup-bg-fg-color ()
-  (setq smm--foreground-backup (face-attribute 'mode-line :foreground))
-  (setq smm--background-backup (face-attribute 'mode-line :background))
-  (setq smm--inactive-foreground-backup (face-attribute 'mode-line-inactive :foreground))
-  (setq smm--inactive-background-backup (face-attribute 'mode-line-inactive :background)))
-
-(defun smm--backup-other ()
-  (setq-default smm--format-backup  mode-line-format)
-  (setq smm--height-backup (face-attribute 'mode-line :height)))
-
-(defun smm-make-slim-modeline ()
-  (smm--backup-bg-fg-color)
-  (smm--backup-other)
-  (setq-default mode-line-format "")
-  (smm--set-modeline-color smm--background-backup)
-  (set-face-attribute 'mode-line nil :height 0.1)
-  (set-face-attribute 'mode-line-inactive nil :height 0.1))
-
-(defun smm--restore-format ()
-  (setq-default mode-line-format smm--format-backup))
-
-(defun smm--restore ()
-  (setq-default mode-line-format smm--format-backup)
-  (set-face-attribute 'mode-line nil :background smm--background-backup)
-  (set-face-attribute 'mode-line nil :foreground smm--foreground-backup)
-  (set-face-attribute 'mode-line-inactive nil :background smm--inactive-background-backup)
-  (set-face-attribute 'mode-line-inactive nil :foreground smm--inactive-foreground-backup)
-  (set-face-attribute 'mode-line nil :height smm--height-backup)
-  (set-face-attribute 'mode-line-inactive nil :height smm--height-backup))
+(defun smm--slim-modeline-enabled-p ()
+  (member 'slim-modeline custom-enabled-themes))
 
 (defun smm--save-and-revert-all-file-buffers ()
   "Save and revert all file buffers. This function used to
@@ -119,13 +50,16 @@
           (revert-buffer :ignore-auto :noconfirm))))))
 
 ;;;###autoload
-(define-minor-mode slim-modeline-mode
-  "Minimize modeline to a line"
-  :global t
-  (progn
-    (if slim-modeline-mode
-        (smm-make-slim-modeline)
-      (smm--restore))
-    (smm--save-and-revert-all-file-buffers)))
+(defun toggle-slim-modeline ()
+  (interactive)
+  (if (smm--slim-modeline-enabled-p)
+      (progn
+        (setq-default mode-line-format smm--modeline-format-backup)
+        (disable-theme 'slim-modeline))
+    (progn
+      (setq smm--modeline-format-backup mode-line-format)
+      (setq-default mode-line-format "")
+      (load-theme 'slim-modeline t)))
+  (smm--save-and-revert-all-file-buffers))
 
 (provide 'slim-modeline)
